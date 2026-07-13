@@ -3,16 +3,14 @@ package com.example.springboot_oauth2.response;
 import java.util.List;
 
 /**
- * JWKS = JSON Web Key Set. Google publish tai jwks-uri, chua cac public key de verify
- chu ky.
- * Vi Spring dung Jackson (FAIL_ON_UNKNOWN=false), cac field thua trong JSON se bi bo
- qua.
+ * JWKS = JSON Web Key Set. Google publish tại jwks-uri, chứa các public key để verify chữ ký.
+ * Vì Spring dùng Jackson (FAIL_ON_UNKNOWN=false), các field thừa trong JSON sẽ bị bỏ qua.
  */
 public record Jwks(
         List<Jwk> keys
 ) {
     public record Jwk(
-            String kid,  // key id - khop voi "kid" trong header ID token
+            String kid,  // key id - khớp với "kid" trong header ID token
             String kty,  // key type = "RSA"
             String alg,  // "RS256"
             String use,  // "sig"

@@ -8,8 +8,8 @@ import org.springframework.web.client.RestClient;
 public class AppConfig {
 
     /**
-     * RestClient la HTTP client hien dai cua Spring (thay cho RestTemplate).
-     * Ta dung no de goi token endpoint + Google Calendar API.
+     * RestClient là HTTP client hiện đại của Spring (thay cho RestTemplate).
+     * Ta dùng nó để gọi token endpoint + Google Calendar API.
      */
     @Bean
     public RestClient restClient() {

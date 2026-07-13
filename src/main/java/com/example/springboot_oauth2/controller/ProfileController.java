@@ -13,7 +13,7 @@ public class ProfileController {
     public String profile(HttpSession session, Model model) {
         AuthenticatedUser user = (AuthenticatedUser) session.getAttribute(OidcAuthController.SESSION_USER);
 
-        // Guard: chua dang nhap OIDC -> ve trang chu (giong pattern CalendarController)
+        // Guard: chưa đăng nhập OIDC -> về trang chủ (giống pattern CalendarController)
         if (user == null) {
             return "redirect:/";
         }

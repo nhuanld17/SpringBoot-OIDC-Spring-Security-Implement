@@ -38,8 +38,8 @@ public class CalendarController {
             CalendarListResponse calendars = calendarService.listCalendars(accessToken);
             model.addAttribute("calendars", calendars.items());
         } catch (RestClientResponseException ex) {
-            model.addAttribute("error", "Google Calendar API tra ve loi "
-                    + ex.getStatusCode().value() + " khi lay danh sach lich.");
+            model.addAttribute("error", "Google Calendar API trả về lỗi "
+                    + ex.getStatusCode().value() + " khi lấy danh sách lịch.");
             return "error-page";
         }
 
@@ -65,9 +65,9 @@ public class CalendarController {
         try {
             events = calendarService.listUpcomingEvents(accessToken, calendarId, now);
         } catch (RestClientResponseException ex) {
-            model.addAttribute("error", "Google Calendar API tra ve loi "
+            model.addAttribute("error", "Google Calendar API trả về lỗi "
                     + ex.getStatusCode().value()
-                    + " khi lay su kien cua lich: " + calendarId);
+                    + " khi lấy sự kiện của lịch: " + calendarId);
             return "error-page";
         }
 

@@ -49,7 +49,7 @@ public class GoogleCalendarService {
                 .encode()
                 .toUri();
 
-        System.out.println(">>> Events URL = " + uri);  // in ra de tu kiem chung
+        System.out.println(">>> Events URL = " + uri);  // in ra để tự kiểm chứng
 
         return restClient.get()
                 .uri(uri)

@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Tai JWKS cua Google va dung RSAPublicKey tu (n, e). Cache theo kid.
- * Google xoay key dinh ky -> gap kid la thi refetch.
+ * Tải JWKS của Google và dựng RSAPublicKey từ (n, e). Cache theo kid.
+ * Google xoay key định kỳ -> gặp kid lạ thì refetch.
  */
 @Service
 public class GoogleJwksClientService {
@@ -29,16 +29,16 @@ public class GoogleJwksClientService {
         this.props = props;
     }
 
-    /** Tra ve public key ung voi kid; neu chua co thi tai lai JWKS 1 lan. */
+    /** Trả về public key ứng với kid; nếu chưa có thì tải lại JWKS 1 lần. */
     public RSAPublicKey resolve(String kid) {
         RSAPublicKey key = cache.get(kid);
         if (key != null) {
             return key;
         }
-        refresh(); // kid la -> co the Google vua xoay key
+        refresh(); // kid lạ -> có thể Google vừa xoay key
         key = cache.get(kid);
         if (key == null) {
-            throw new IllegalStateException("Khong tim thay public key (kid=" + kid + ")  trong JWKS Google.");
+            throw new IllegalStateException("Không tìm thấy public key (kid=" + kid + ") trong JWKS Google.");
         }
         return key;
     }
@@ -58,17 +58,17 @@ public class GoogleJwksClientService {
         this.cache = fresh;
     }
 
-    /** Dung RSAPublicKey tu modulus (n) + exponent (e) dang base64url. */
+    /** Dựng RSAPublicKey từ modulus (n) + exponent (e) dạng base64url. */
     private RSAPublicKey toRsaPublicKey(Jwks.Jwk jwk) {
         try {
-            // so 1 = dau duong: n, e la so nguyen duong lon
+            // số 1 = dấu dương: n, e là số nguyên dương lớn
             BigInteger modulus = new BigInteger(1, JwtUtil.base64UrlDecode(jwk.n()));
             BigInteger exponent = new BigInteger(1, JwtUtil.base64UrlDecode(jwk.e()));
             KeyFactory factory = KeyFactory.getInstance("RSA");
             return (RSAPublicKey) factory.generatePublic(new RSAPublicKeySpec(modulus,
                     exponent));
         } catch (Exception ex) {
-            throw new IllegalStateException("Khong dung duoc RSA public key tu JWK: " +
+            throw new IllegalStateException("Không dựng được RSA public key từ JWK: " +
                     ex.getMessage(), ex);
         }
     }

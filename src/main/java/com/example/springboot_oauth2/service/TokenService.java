@@ -19,8 +19,8 @@ public class TokenService {
 
     /**
      * Trả về accessToken nếu còn hạn, nếu sắp hết hạn (còn < 60s) và có
-     * refreshtoke thì tự động refresh, cập nhật lại session
-     * Trả null nếu chưa ủy quyền
+     * refresh token thì tự động refresh, cập nhật lại session.
+     * Trả null nếu chưa ủy quyền.
      */
     public String getValidAccessToken(HttpSession session) {
         TokenResponse token = (TokenResponse) session.getAttribute(OidcAuthController.SESSION_TOKEN);
@@ -43,13 +43,13 @@ public class TokenService {
             return token.access_token();
         }
 
-        // refreshtone
+        // refresh token
         System.out.println(">>> Access token sắp hết hạn -> đang refresh ...");
 
         try {
             return refresh(session, token).access_token();
         } catch (RestClientException e) {
-            // refreshtoken hỏng -> xóa token, buộc đăng nhập lại
+            // refresh token hỏng -> xóa token, buộc đăng nhập lại
             session.removeAttribute(OidcAuthController.SESSION_TOKEN);
 
             session.removeAttribute(OidcAuthController.SESSION_EXPIRES_AT);
@@ -58,7 +58,7 @@ public class TokenService {
     }
 
     /**
-     * Gọi refresh grant và GHÌ ĐÈ session. Tách riêng để endpoint demo gọi trực tiếp
+     * Gọi refresh grant và GHI ĐÈ session. Tách riêng để endpoint demo gọi trực tiếp.
      */
     public TokenResponse refresh(HttpSession session, TokenResponse currentToken) {
         TokenResponse refreshedToken = (TokenResponse) oidcService.refreshAccessToken(currentToken.refresh_token());

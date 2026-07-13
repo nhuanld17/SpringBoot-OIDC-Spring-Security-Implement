@@ -7,9 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 /**
- * Tien ich thao tac JWT (ID token) o muc "tho": tach phan, base64url-decode, parse
- JSON.
- * KHONG verify o day - verify nam trong IdTokenVerifier.
+ * Tiện ích thao tác JWT (ID token) ở mức "thô": tách phần, base64url-decode, parse JSON.
+ * KHÔNG verify ở đây - verify nằm trong IdTokenVerifier.
  */
 public class JwtUtil {
     private static final Base64.Decoder URL_DECODER = Base64.getUrlDecoder();
@@ -18,27 +17,27 @@ public class JwtUtil {
     private JwtUtil() {
     }
 
-    /** Tach "header.payload.signature" thanh 3 phan. */
+    /** Tách "header.payload.signature" thành 3 phần. */
     public static String[] split(String jwt) {
         String[] parts = jwt.split("\\.");
         if (parts.length != 3) {
-            throw new IllegalArgumentException("ID token khong dung dinh dang JWT (can 3  phan).");
+            throw new IllegalArgumentException("ID token không đúng định dạng JWT (cần 3 phần).");
         }
         return parts;
     }
 
-    /** base64url-decode -> bytes tho. */
+    /** base64url-decode -> bytes thô. */
     public static byte[] base64UrlDecode(String data) {
         return URL_DECODER.decode(data);
     }
 
-    /** Decode 1 phan (header hoac payload) tu base64url -> cay JSON de doc claim. */
+    /** Decode 1 phần (header hoặc payload) từ base64url -> cây JSON để đọc claim. */
     public static JsonNode decodeToJson(String part) {
         try {
             byte[] json = base64UrlDecode(part);
             return MAPPER.readTree(new String(json, StandardCharsets.UTF_8));
         } catch (Exception e) {
-            throw new IllegalArgumentException("Khong parse duoc phan JWT: " +
+            throw new IllegalArgumentException("Không parse được phần JWT: " +
                     e.getMessage(), e);
         }
     }

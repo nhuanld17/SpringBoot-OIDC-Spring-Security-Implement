@@ -8,9 +8,9 @@ public final class NonceUtils {
     private static final Base64.Encoder URL_ENCODER = Base64.getUrlEncoder().withoutPadding();
 
     /**
-     * Sinh "nonce" ngau nhien cho OIDC.
-     * Khac state (chong CSRF o callback): nonce se duoc Google NHUNG vao ID token.
-     * Luc verify, ta so nonce trong token voi nonce da luu -> chong REPLAY id_token.
+     * Sinh "nonce" ngẫu nhiên cho OIDC.
+     * Khác state (chống CSRF ở callback): nonce sẽ được Google NHÚNG vào ID token.
+     * Lúc verify, ta so nonce trong token với nonce đã lưu -> chống REPLAY id_token.
      */
     public static String generateNonce() {
         byte[] bytes = new byte[16];

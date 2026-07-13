@@ -6,12 +6,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * PHASE 1: Vi ta TU dung OAuth2 flow bang tay, ta KHONG dung tinh nang dang nhap
- * cua Spring Security. Nhung spring-boot-starter-oauth2-client keo theo Spring Security,
- * ma mac dinh Spring Security khoa TAT CA request -> bat dang nhap.
+ * PHASE 1: Vì ta TỰ dựng OAuth2 flow bằng tay, ta KHÔNG dùng tính năng đăng nhập
+ * của Spring Security. Nhưng spring-boot-starter-oauth2-client kéo theo Spring Security,
+ * mà mặc định Spring Security khóa TẤT CẢ request -> bắt đăng nhập.
  *
- * Nen o day ta mo het (permitAll) de flow thu cong hoat dong.
- * Sang Phase 2 ta se thay config nay bang cau hinh OAuth2 that su cua Spring Security.
+ * Nên ở đây ta mở hết (permitAll) để flow thủ công hoạt động.
+ * Sang Phase 2 ta sẽ thay config này bằng cấu hình OAuth2 thật sự của Spring Security.
  */
 @Configuration
 public class SecurityConfig {
@@ -20,7 +20,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                // Demo: tat CSRF cho don gian (flow cua ta chi dung GET redirect).
+                // Demo: tắt CSRF cho đơn giản (flow của ta chỉ dùng GET redirect).
                 .csrf(csrf -> csrf.disable());
         return http.build();
     }

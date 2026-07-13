@@ -26,7 +26,7 @@ public class OidcAuthController {
     private final IdTokenVerifierService idTokenVerifierService;
     private final TokenService tokenService;
 
-    // Session keys RIENG cho OIDC (tach khoi nhanh Calendar dung "oauth_*")
+    // Session keys RIÊNG cho OIDC (tách khỏi nhánh Calendar dùng "oauth_*")
     public static final String SESSION_STATE = "oidc_state";
     public static final String SESSION_NONCE = "oidc_nonce";
     public static final String SESSION_CODE_VERIFIER = "oidc_code_verifier";
@@ -61,12 +61,12 @@ public class OidcAuthController {
                 .queryParam("redirect_uri", props.redirectUri())
                 .queryParam("response_type", "code")
                 .queryParam("scope", props.scope())            // openid profile email + calendar
-                .queryParam("state", state)                    // chong CSRF
-                .queryParam("nonce", nonce)                    // chong replay ID token
+                .queryParam("state", state)                    // chống CSRF
+                .queryParam("nonce", nonce)                    // chống replay ID token
                 .queryParam("code_challenge", codeChallenge)   // PKCE
                 .queryParam("code_challenge_method", "S256")
-                .queryParam("access_type", "offline")           // xin ca REFRESH token
-                .queryParam("prompt", "consent")                // luon hien consent (de chac chan co refresh token)
+                .queryParam("access_type", "offline")           // xin cả REFRESH token
+                .queryParam("prompt", "consent")                // luôn hiện consent (để chắc chắn có refresh token)
                 .build()
                 .encode()
                 .toUriString();
@@ -83,50 +83,50 @@ public class OidcAuthController {
             Model model
     ) {
         if (error != null) {
-            model.addAttribute("error", "Google tra ve loi: " + error);
+            model.addAttribute("error", "Google trả về lỗi: " + error);
             return "error-page";
         }
 
-        // Chong CSRF: state phai khop
+        // Chống CSRF: state phải khớp
         String savedState = (String) session.getAttribute(SESSION_STATE);
         if (savedState == null || !savedState.equals(state)) {
-            model.addAttribute("error", "State khong khop -> nghi ngo CSRF. Tu choi.");
+            model.addAttribute("error", "State không khớp -> nghi ngờ CSRF. Từ chối.");
             return "error-page";
         }
 
         String codeVerifier = (String) session.getAttribute(SESSION_CODE_VERIFIER);
         String expectedNonce = (String) session.getAttribute(SESSION_NONCE);
 
-        // Doi code lay token
+        // Đổi code lấy token
         TokenResponse token;
         try {
             token = oidcService.exchangeCodeForToken(code, codeVerifier);
         } catch (RestClientResponseException ex) {
-            model.addAttribute("error", "Doi code lay token that bai ("
+            model.addAttribute("error", "Đổi code lấy token thất bại ("
                     + ex.getStatusCode().value() + "): " +
                     ex.getResponseBodyAsString());
             return "error-page";
         }
 
         if (token == null || token.id_token() == null) {
-            model.addAttribute("error", "Khong nhan duoc id_token tu Google.");
+            model.addAttribute("error", "Không nhận được id_token từ Google.");
             return "error-page";
         }
 
-        // VERIFY id_token (chu ky + claims + nonce)
+        // VERIFY id_token (chữ ký + claims + nonce)
         AuthenticatedUser user;
         try {
             user = idTokenVerifierService.verify(token.id_token(), expectedNonce);
         } catch (RuntimeException ex) {
-            model.addAttribute("error", "ID token khong hop le: " + ex.getMessage());
+            model.addAttribute("error", "ID token không hợp lệ: " + ex.getMessage());
             return "error-page";
         }
 
-        // Dang nhap thanh cong -> luu user + token, don gia tri dung 1 lan
+        // Đăng nhập thành công -> lưu user + token, dọn giá trị dùng 1 lần
         session.setAttribute(SESSION_USER, user);
         session.setAttribute(SESSION_TOKEN, token);
 
-        // Tinh thoi diem access token het han = bay gio + expires_in (second)
+        // Tính thời điểm access token hết hạn = bây giờ + expires_in (second)
         Instant expiresAt = Instant.now().plusSeconds(token.expires_in());
         session.setAttribute(SESSION_EXPIRES_AT, expiresAt);
 
@@ -134,7 +134,7 @@ public class OidcAuthController {
         session.removeAttribute(SESSION_NONCE);
         session.removeAttribute(SESSION_CODE_VERIFIER);
 
-        // Hien thi ra connected.html
+        // Hiển thị ra connected.html
         model.addAttribute("hasAccessToken", token.access_token() != null);
         model.addAttribute("hasRefreshToken", token.refresh_token() != null);
         model.addAttribute("expiresIn", token.expires_in());
@@ -168,7 +168,7 @@ public class OidcAuthController {
             return "error-page";
         }
 
-        // So sanh 20 ky tu dau de thay token da DOI
+        // So sánh 20 ký tự đầu để thấy token đã ĐỔI
         model.addAttribute("oldPrefix", oldAccess.substring(0, Math.min(20, oldAccess.length())) + "...");
         model.addAttribute("newPrefix", refreshed.access_token().substring(0, Math.min(20, refreshed.access_token().length())) + "...");
         model.addAttribute("newExpiresIn", refreshed.expires_in());
