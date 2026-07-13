@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <title>OAuth2 Calendar Demo</title>
-</head>
-<body>
-<h1>Google Calendar OAuth2 Demo</h1>
-<p>Bấm nút dưới để ủy quyền cho app truy cập Google Calendar của bạn.</p>
+    <head>
+        <meta charset="UTF-8">
+        <title>Google OAuth2 & OIDC Demo</title>
+    </head>
+    <body>
+        <h1>Google OAuth2 & OIDC Demo</h1>
 
-<!-- Link toi endpoint khoi dong flow OAuth2 -->
-<a href="/oauth2/authorize">
-    <button>Connect Google Calendar</button>
-</a>
-</body>
+        <h2>Đăng nhập & Ủy quyền kết hợp (OIDC + Calendar)</h2>
+        <p>Hệ thống tự động thực hiện đăng nhập danh tính (OIDC) kết hợp xin quyền truy cập Google Calendar trong cùng 1 lần nhấn.</p>
+        <a href="/oidc/authorize">
+            <button style="font-size: 16px; padding: 10px 20px; cursor: pointer;">Login with Google</button>
+        </a>
+    </body>
 </html>

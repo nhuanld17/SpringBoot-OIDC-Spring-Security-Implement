@@ -15,7 +15,11 @@
     <li>Token type: <b th:text="${tokenType}"></b></li>
     <li>Scope được cấp: <b th:text="${scope}"></b></li>
 </ul>
-<p><a href="/calendars"><button>Xem lịch của tôi →</button></a></p>
+<p>
+    <a href="/calendars"><button style="padding:5px 10px; cursor:pointer;">Xem lịch của tôi →</button></a>
+    &nbsp;|&nbsp;
+    <a href="/profile"><button style="padding:5px 10px; cursor:pointer;">Xem hồ sơ cá nhân (OIDC) →</button></a>
+</p>
 <a href="/">← Về trang chủ</a>
 </body>
 </html>

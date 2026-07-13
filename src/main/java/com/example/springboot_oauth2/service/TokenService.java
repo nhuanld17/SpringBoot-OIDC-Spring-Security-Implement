@@ -1,6 +1,6 @@
 package com.example.springboot_oauth2.service;
 
-import com.example.springboot_oauth2.controller.AuthController;
+import com.example.springboot_oauth2.controller.OidcAuthController;
 import com.example.springboot_oauth2.response.TokenResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
@@ -11,10 +11,10 @@ import java.time.Instant;
 @Service
 public class TokenService {
 
-    private final GoogleOAuthService oauthService;
+    private final GoogleOidcService oidcService;
 
-    public TokenService(GoogleOAuthService oauthService) {
-        this.oauthService = oauthService;
+    public TokenService(GoogleOidcService oidcService) {
+        this.oidcService = oidcService;
     }
 
     /**
@@ -23,13 +23,13 @@ public class TokenService {
      * Trả null nếu chưa ủy quyền
      */
     public String getValidAccessToken(HttpSession session) {
-        TokenResponse token = (TokenResponse) session.getAttribute(AuthController.SESSION_TOKEN);
+        TokenResponse token = (TokenResponse) session.getAttribute(OidcAuthController.SESSION_TOKEN);
 
         if (token == null || token.access_token() == null) {
             return null;
         }
 
-        Instant expiresAt = (Instant) session.getAttribute(AuthController.SESSION_EXPIRES_AT);
+        Instant expiresAt = (Instant) session.getAttribute(OidcAuthController.SESSION_EXPIRES_AT);
 
         // Nếu còn hạn thoải mái (> 60s) -> dùng accesstoken, không refresh
         if (expiresAt != null &&
@@ -50,9 +50,9 @@ public class TokenService {
             return refresh(session, token).access_token();
         } catch (RestClientException e) {
             // refreshtoken hỏng -> xóa token, buộc đăng nhập lại
-            session.removeAttribute(AuthController.SESSION_TOKEN);
+            session.removeAttribute(OidcAuthController.SESSION_TOKEN);
 
-            session.removeAttribute(AuthController.SESSION_EXPIRES_AT);
+            session.removeAttribute(OidcAuthController.SESSION_EXPIRES_AT);
             return null; // controller sẽ redirect về "/"
         }
     }
@@ -61,7 +61,7 @@ public class TokenService {
      * Gọi refresh grant và GHÌ ĐÈ session. Tách riêng để endpoint demo gọi trực tiếp
      */
     public TokenResponse refresh(HttpSession session, TokenResponse currentToken) {
-        TokenResponse refreshedToken = (TokenResponse) oauthService.refreshAccessToken(currentToken.refresh_token());
+        TokenResponse refreshedToken = (TokenResponse) oidcService.refreshAccessToken(currentToken.refresh_token());
 
         // Google KHÔNG TRẢ refresh token mới -> giữ lại cái cũ
         TokenResponse merged = new TokenResponse(
@@ -73,8 +73,8 @@ public class TokenService {
                 refreshedToken.id_token()
         );
 
-        session.setAttribute(AuthController.SESSION_TOKEN, merged);
-        session.setAttribute(AuthController.SESSION_EXPIRES_AT,
+        session.setAttribute(OidcAuthController.SESSION_TOKEN, merged);
+        session.setAttribute(OidcAuthController.SESSION_EXPIRES_AT,
                 Instant.now().plusSeconds(refreshedToken.expires_in()));
 
         return merged;
