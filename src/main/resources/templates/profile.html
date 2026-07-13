@@ -6,24 +6,24 @@
 </head>
 <body>
 <h1>👤 Đăng nhập thành công (OIDC)</h1>
-<p>Backend đã verify <code>id_token</code> (chữ ký RS256 + claims iss/aud/exp/nonce)
+<p>Spring Security đã verify <code>id_token</code> (chữ ký RS256 + claims iss/aud/exp/nonce)
     và xác định bạn là:</p>
 
 <img th:if="${user.picture}" th:src="${user.picture}" alt="avatar" width="96"
      height="96"/>
 
 <ul>
-    <li>Tên: <b th:text="${user.name}">—</b></li>
+    <li>Tên: <b th:text="${user.fullName}">—</b></li>
     <li>Email: <b th:text="${user.email}">—</b>
         <span th:if="${user.emailVerified}"> (đã xác minh)</span></li>
-    <li>Subject (sub): <code th:text="${user.sub}">—</code></li>
+    <li>Subject (sub): <code th:text="${user.subject}">—</code></li>
 </ul>
 
 <a href="/calendars"><button style="padding:5px 10px; cursor:pointer;">📅 Xem lịch của tôi</button></a>
 &nbsp;|&nbsp;
-<a href="/oidc/refresh"><button style="padding:5px 10px; cursor:pointer;">🔄 Mô phỏng Refresh Token</button></a>
-&nbsp;|&nbsp;
-<a href="/logout"><button style="padding:5px 10px; cursor:pointer;">Đăng xuất</button></a>
+<form th:action="@{/logout}" method="post" style="display:inline">
+    <button type="submit" style="padding:5px 10px; cursor:pointer;">Đăng xuất</button>
+</form>
 &nbsp;|&nbsp;
 <a href="/">← Trang chủ</a>
 </body>

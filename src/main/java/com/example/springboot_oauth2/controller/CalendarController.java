@@ -3,8 +3,8 @@ package com.example.springboot_oauth2.controller;
 import com.example.springboot_oauth2.response.CalendarListResponse;
 import com.example.springboot_oauth2.response.EventsResponse;
 import com.example.springboot_oauth2.service.GoogleCalendarService;
-import com.example.springboot_oauth2.service.TokenService;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,22 +17,18 @@ import java.time.Instant;
 public class CalendarController {
 
     private final GoogleCalendarService calendarService;
-    private final TokenService tokenService;
 
-    public CalendarController(GoogleCalendarService calendarService, TokenService tokenService) {
+    public CalendarController(GoogleCalendarService calendarService) {
         this.calendarService = calendarService;
-        this.tokenService = tokenService;
     }
 
     @GetMapping("/calendars")
-    public String calendars(HttpSession session, Model model) {
-        // Lấy token đã lưu từ flow OAuth
-        String accessToken = tokenService.getValidAccessToken(session);
-
-        // Nếu chưa đăng nhập hoặc chưa được ủy quyền -> về trang chủ
-        if (accessToken == null) {
-            return "redirect:/";
-        }
+    public String calendars(
+            @RegisteredOAuth2AuthorizedClient("google") OAuth2AuthorizedClient client,
+            Model model
+    ) {
+        // Spring quản lý token trong OAuth2AuthorizedClient và tự refresh nếu hết hạn
+        String accessToken = client.getAccessToken().getTokenValue();
 
         try {
             CalendarListResponse calendars = calendarService.listCalendars(accessToken);
@@ -48,17 +44,13 @@ public class CalendarController {
 
     @GetMapping("/events")
     public String events(
-        @RequestParam String calendarId,
-        HttpSession session,
-        Model model
-    ){
-        String accessToken = tokenService.getValidAccessToken(session);
+            @RequestParam String calendarId,
+            @RegisteredOAuth2AuthorizedClient("google") OAuth2AuthorizedClient client,
+            Model model
+    ) {
+        String accessToken = client.getAccessToken().getTokenValue();
 
-        if (accessToken == null) {
-            return "redirect:/";
-        }
-
-        // timeMin = thời điểm hiện tại (dạng RFC3339, vd 2026-07-08T14:00:00+07:00)
+        // timeMin = thời điểm hiện tại (dạng RFC3339 UTC, kết thúc bằng 'Z')
         String now = Instant.now().toString();
 
         EventsResponse events;

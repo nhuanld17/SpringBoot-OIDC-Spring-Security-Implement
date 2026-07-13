@@ -1,7 +1,7 @@
 package com.example.springboot_oauth2.controller;
 
-import com.example.springboot_oauth2.model.AuthenticatedUser;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,15 +9,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class ProfileController {
 
+    /**
+     * Danh tính người dùng do Spring Security cung cấp qua OidcUser
+     * (đã verify ID token). Không cần đọc session hay guard null:
+     * SecurityConfig đã bắt buộc authenticated cho /profile.
+     */
     @GetMapping("/profile")
-    public String profile(HttpSession session, Model model) {
-        AuthenticatedUser user = (AuthenticatedUser) session.getAttribute(OidcAuthController.SESSION_USER);
-
-        // Guard: chưa đăng nhập OIDC -> về trang chủ (giống pattern CalendarController)
-        if (user == null) {
-            return "redirect:/";
-        }
-
+    public String profile(@AuthenticationPrincipal OidcUser user, Model model) {
         model.addAttribute("user", user);
         return "profile";
     }
